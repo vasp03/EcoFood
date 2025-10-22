@@ -2,10 +2,10 @@
 package com.ecofood.ecofood;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -13,8 +13,10 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = ecofood.MODID)
 public class CowDropHandler {
-    private static final String GRASS_COUNT_KEY = "ecofood_grass_count";
-    private static final int TICK_INTERVAL = 1200;
+    private static final String GRASS_COUNT_KEY = "ecofood_eco_value";
+    private static final int TICK_INTERVAL = 20;
+    private static final int SCAN_RADIUS = 3;
+    private static final int SCAN_HEIGHT = 1;
 
     @SubscribeEvent
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
@@ -26,21 +28,33 @@ public class CowDropHandler {
             if (tickCounter >= TICK_INTERVAL) {
                 tickCounter = 0;
                 // Scan for grass blocks in radius
-                int grassCount = 0;
-                int radius = 5;
+                int ecoValue = 0;
                 var pos = cow.blockPosition();
                 var level = cow.level();
-                for (int dx = -radius; dx <= radius; dx++) {
-                    for (int dy = -1; dy <= 1; dy++) {
-                        for (int dz = -radius; dz <= radius; dz++) {
+                for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS; dx++) {
+                    for (int dy = -1; dy <= SCAN_HEIGHT; dy++) {
+                        for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS; dz++) {
                             var checkPos = pos.offset(dx, dy, dz);
-                            if (level.getBlockState(checkPos).is(Blocks.GRASS_BLOCK)) {
-                                grassCount++;
+                            if (level.getBlockState(checkPos).is(BlockTags.DIRT)) {
+                                ecoValue += 2;
+                            } else if (level.getBlockState(checkPos).is(BlockTags.STONE_ORE_REPLACEABLES)) {
+                                ecoValue -= 4;
+                            } else if (level.getBlockState(checkPos).is(BlockTags.TERRACOTTA)) {
+                                ecoValue -= 4;
+                            } else if (level.getBlockState(checkPos).is(BlockTags.FLOWERS)) {
+                                ecoValue += 1;
+                            } else if (level.getBlockState(checkPos).is(BlockTags.LEAVES)) {
+                                ecoValue += 1;
                             }
                         }
                     }
                 }
-                data.putInt(GRASS_COUNT_KEY, grassCount);
+
+                if (ecoValue < 0) {
+                    ecoValue = 0;
+                }
+
+                data.putInt(GRASS_COUNT_KEY, ecoValue);
             }
             data.putInt("ecofood_tick_counter", tickCounter);
         }
