@@ -68,7 +68,7 @@ public class ecofood {
 
     //Meat Block
     public static final RegistryObject<Block> MEAT_BLOCK = BLOCKS.register("meat_block",
-            () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0f).requiresCorrectToolForDrops()));
+            () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT)));
     public static final RegistryObject<Item> MEAT_BLOCK_ITEM = ITEMS.register("meat_block",
             () -> new BlockItem(MEAT_BLOCK.get(), new Item.Properties()));
 

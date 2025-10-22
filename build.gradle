@@ -120,6 +120,10 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+
+    maven {
+        url = "https://maven.ithundxr.dev/mirror"
+    }
 }
 
 dependencies {
@@ -144,6 +148,8 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
